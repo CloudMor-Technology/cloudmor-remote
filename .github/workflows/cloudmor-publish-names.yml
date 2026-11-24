@@ -8,6 +8,11 @@ name: CloudMor Remote - publish customer-facing file names
 #      file name is what switches the app into Quick Support mode)
 # Repo: CloudMor-Technology/cloudmor-remote. Runs on Linux (cheap).
 on:
+  # workflow_dispatch only works from the default branch; on the cloudmor
+  # branch, edit .cloudmor-publish (its first line is the tag) to run this.
+  push:
+    branches: [cloudmor]
+    paths: ['.cloudmor-publish']
   workflow_dispatch:
     inputs:
       tag:
@@ -26,9 +31,14 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ inputs.tag }}
+          FROM_FILE: ${{ github.event_name == 'push' }}
         run: |
           set -euo pipefail
           R=${{ github.repository }}
+          if [ "$FROM_FILE" = true ]; then
+            TAG="$(gh api "repos/$R/contents/.cloudmor-publish?ref=${{ github.sha }}" --jq .content | base64 -d | head -1 | tr -d '[:space:]')"
+          fi
+          echo "Release: $TAG"
           gh release download "$TAG" -R "$R" -p 'rustdesk-*-x86_64.msi' -p 'rustdesk-*-x86_64.exe' -D in
           cp in/rustdesk-*-x86_64.msi CloudMor-Remote-Setup.msi
           cp in/rustdesk-*-x86_64.exe CloudMor-Support-qs.exe
