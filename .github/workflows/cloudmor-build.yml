@@ -4,6 +4,8 @@ name: CloudMor Remote release
 # and publishes it to the GitHub release named by `tag`. Repo: CloudMor-Technology/cloudmor-remote.
 
 on:
+  push:
+    tags: ['cloudmor-*']
   workflow_dispatch:
     inputs:
       tag:
@@ -20,4 +22,4 @@ jobs:
     secrets: inherit
     with:
       upload-artifact: true
-      upload-tag: ${{ inputs.tag }}
+      upload-tag: ${{ inputs.tag || github.ref_name }}
