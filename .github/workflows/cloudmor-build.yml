@@ -1,0 +1,23 @@
+name: CloudMor Remote release
+
+# Builds the CloudMor-branded RustDesk client (Windows x64 MSI/EXE, macOS arm64/x86_64 DMG)
+# and publishes it to the GitHub release named by `tag`. Repo: CloudMor-Technology/cloudmor-remote.
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag to publish to
+        default: cloudmor-1.4.9
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    uses: ./.github/workflows/cloudmor-flutter-build.yml
+    secrets: inherit
+    with:
+      upload-artifact: true
+      upload-tag: ${{ inputs.tag }}
