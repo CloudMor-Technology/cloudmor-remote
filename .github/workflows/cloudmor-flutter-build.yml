@@ -9,6 +9,9 @@ on:
       upload-tag:
         type: string
         default: "nightly"
+      build-macos:
+        type: boolean
+        default: true
 
 # CloudMor: trimmed copy of flutter-build.yml (Windows x64 + macOS only) with branding.
 # NOTE: F-Droid builder script 'flutter/build_fdroid.sh' reads environment
@@ -370,6 +373,7 @@ jobs:
   # The fallback for the flutter version, we use Sciter for 32bit Windows.
   build-for-macOS:
     name: ${{ matrix.job.target }}
+    if: ${{ inputs.build-macos }}
     runs-on: ${{ matrix.job.os }}
     needs: [generate-bridge]
     strategy:

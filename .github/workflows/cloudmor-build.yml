@@ -14,6 +14,10 @@ on:
         description: Release tag to publish to
         default: cloudmor-1.4.9
         required: true
+      macos:
+        description: Also build macOS (Mac runners cost ~10x Linux/Windows)
+        type: boolean
+        default: true
 
 permissions:
   contents: write
@@ -25,3 +29,4 @@ jobs:
     with:
       upload-artifact: true
       upload-tag: ${{ inputs.tag || vars.CLOUDMOR_RELEASE_TAG || 'cloudmor-1.4.9' }}
+      build-macos: ${{ github.event_name != 'workflow_dispatch' || inputs.macos }}
