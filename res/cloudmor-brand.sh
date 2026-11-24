@@ -10,6 +10,13 @@ HOST="rmm.cloudmor.com"
 KEY="RKFf6+bue2XOuBuxBHlw29L7L2WHoWJxAtmoA0Upxa0="
 CFG=libs/hbb_common/src/config.rs
 perl -pi -e "s/RwLock::new\(\"RustDesk\"\.to_owned\(\)\)/RwLock::new(\"$NAME\".to_owned())/" "$CFG"
+# Org prefix for macOS settings folders and launchd job names (com.cloudmor.CloudMor Remote_service).
+perl -pi -e "s/RwLock::new\(\"com\.carriez\"\.to_owned\(\)\)/RwLock::new(\"com.cloudmor\".to_owned())/" "$CFG"
+grep -q '"com.cloudmor".to_owned()' "$CFG"
+# launchd job labels match the org above (the app name is substituted at install time).
+perl -pi -e 's/com\.carriez\.RustDesk/com.cloudmor.RustDesk/g' src/platform/privileges_scripts/*
+grep -q 'com.cloudmor.RustDesk_service' src/platform/privileges_scripts/daemon.plist
+perl -pi -e 's{<string>com\.carriez\.rustdesk</string>}{<string>com.cloudmor.remote</string>}' flutter/macos/Runner/Info.plist
 perl -pi -e "s/^pub const RENDEZVOUS_SERVERS: &\[&str\] = &\[.*\];/pub const RENDEZVOUS_SERVERS: &[&str] = &[\"$HOST\"];/" "$CFG"
 perl -pi -e "s|^pub const RS_PUB_KEY: &str = \".*\";|pub const RS_PUB_KEY: &str = \"$KEY\";|" "$CFG"
 grep -q "\"$NAME\".to_owned()" "$CFG"
