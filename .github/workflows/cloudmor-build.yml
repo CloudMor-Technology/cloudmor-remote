@@ -15,7 +15,11 @@ on:
         default: cloudmor-1.4.9
         required: true
       macos:
-        description: Also build macOS (Mac runners cost ~10x Linux/Windows)
+        description: Build macOS (Mac runners cost ~10x Linux/Windows)
+        type: boolean
+        default: true
+      windows:
+        description: Build Windows
         type: boolean
         default: true
 
@@ -30,3 +34,4 @@ jobs:
       upload-artifact: true
       upload-tag: ${{ inputs.tag || vars.CLOUDMOR_RELEASE_TAG || 'cloudmor-1.4.9' }}
       build-macos: ${{ github.event_name != 'workflow_dispatch' || inputs.macos }}
+      build-windows: ${{ github.event_name != 'workflow_dispatch' || inputs.windows }}

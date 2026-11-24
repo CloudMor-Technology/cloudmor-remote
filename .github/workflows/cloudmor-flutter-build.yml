@@ -12,6 +12,9 @@ on:
       build-macos:
         type: boolean
         default: true
+      build-windows:
+        type: boolean
+        default: true
 
 # CloudMor: trimmed copy of flutter-build.yml (Windows x64 + macOS only) with branding.
 # NOTE: F-Droid builder script 'flutter/build_fdroid.sh' reads environment
@@ -61,6 +64,7 @@ jobs:
     uses: ./.github/workflows/bridge.yml
 
   build-RustDeskTempTopMostWindow:
+    if: ${{ inputs.build-windows }}
     uses: ./.github/workflows/third-party-RustDeskTempTopMostWindow.yml
     strategy:
       fail-fast: false
@@ -78,6 +82,7 @@ jobs:
       target_version: Windows10
 
   build-for-windows-flutter:
+    if: ${{ inputs.build-windows }}
     name: ${{ matrix.job.target }}
     needs: [build-RustDeskTempTopMostWindow, generate-bridge]
     runs-on: ${{ matrix.job.os }}
