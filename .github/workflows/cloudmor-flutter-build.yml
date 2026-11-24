@@ -342,6 +342,7 @@ jobs:
         if: env.UPLOAD_ARTIFACT == 'true'
         run: |
           pushd ./res/msi
+          Rename-Item -Path ../../rustdesk/rustdesk.exe -NewName "CloudMor Remote.exe"
           python preprocess.py --arp -d ../../rustdesk -c --app-name "CloudMor Remote" -m "CloudMor"
           nuget restore msi.sln
           $msiPlatform = if ('${{ matrix.job.arch }}' -eq 'aarch64') { 'ARM64' } else { 'x64' }

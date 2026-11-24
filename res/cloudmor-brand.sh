@@ -19,4 +19,7 @@ perl -pi -e "s/^PRODUCT_NAME = .*/PRODUCT_NAME = $NAME/; s/^PRODUCT_BUNDLE_IDENT
 perl -pi -e "s/\"RustDesk Remote Desktop\"/\"$NAME\"/; s/VALUE \"ProductName\", \"RustDesk\"/VALUE \"ProductName\", \"$NAME\"/; s/VALUE \"CompanyName\", \".*?\"/VALUE \"CompanyName\", \"CloudMor\"/" flutter/windows/runner/Runner.rc
 perl -pi -e "s{Release/RustDesk\.app/}{Release/\"$NAME.app\"/}g" build.py
 grep -q "Release/\"$NAME.app\"/" build.py
+# The MSI preprocessor runs "<app name>.exe" unquoted; quote it for the space in the name.
+perl -pi -e 's/f"\{dist_app\} \{args\}"/f\x27"{dist_app}" {args}\x27/' res/msi/preprocess.py
+grep -q "f'\"{dist_app}\" {args}'" res/msi/preprocess.py
 echo "Branded as $NAME on $HOST"
