@@ -1,0 +1,37 @@
+name: CloudMor Remote - publish customer-facing file names
+
+# Adds copies of the Windows build under CloudMor names to a release and marks
+# it latest, so stable links work:
+#   .../releases/latest/download/CloudMor-Remote-Setup.msi   (managed install)
+#   .../releases/latest/download/CloudMor-Support-qs.exe     (one-time Quick Support:
+#      runs without installing, shows an ID + one-time password; "-qs" in the
+#      file name is what switches the app into Quick Support mode)
+# Repo: CloudMor-Technology/cloudmor-remote. Runs on Linux (cheap).
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag
+        default: cloudmor-1.4.9-2
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Copy assets under CloudMor names
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.tag }}
+        run: |
+          set -euo pipefail
+          R=${{ github.repository }}
+          gh release download "$TAG" -R "$R" -p 'rustdesk-*-x86_64.msi' -p 'rustdesk-*-x86_64.exe' -D in
+          cp in/rustdesk-*-x86_64.msi CloudMor-Remote-Setup.msi
+          cp in/rustdesk-*-x86_64.exe CloudMor-Support-qs.exe
+          gh release upload "$TAG" -R "$R" --clobber CloudMor-Remote-Setup.msi CloudMor-Support-qs.exe
+          gh release edit "$TAG" -R "$R" --latest --prerelease=false
+          sha256sum CloudMor-Remote-Setup.msi CloudMor-Support-qs.exe
