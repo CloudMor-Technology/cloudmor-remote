@@ -332,6 +332,22 @@ pub fn core_main() -> Option<Vec<String>> {
         #[cfg(target_os = "macos")]
         {
             use crate::platform;
+            // CloudMor: ask macOS for Accessibility and Screen Recording without
+            // opening the main window. Run in the signed-in user's session (the
+            // CloudMor RMM installer does this right after installing), it puts
+            // CloudMor Remote in both Privacy & Security lists and shows the
+            // system prompts, so nobody has to search for the app or click "+".
+            if args[0] == "--request-permissions" {
+                let accessibility = platform::macos::is_process_trusted(true);
+                let screen_recording = platform::macos::is_can_screen_recording(true);
+                println!(
+                    "accessibility={} screen_recording={}",
+                    accessibility, screen_recording
+                );
+                // Keep the process alive briefly so the system prompts can show.
+                std::thread::sleep(std::time::Duration::from_secs(20));
+                return None;
+            }
             if args[0] == "--update" {
                 if args.len() > 1 && args[1].ends_with(".dmg") {
                     // Version check is unnecessary unless downgrading to an older version
